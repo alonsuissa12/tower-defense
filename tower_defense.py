@@ -1,12 +1,11 @@
 import random
-from re import match
-
 import pygame
 import enemy
+import sys
 
 pygame.init()
 
-game_speed = 2
+game_speed = 1
 fps = 30
 screen_w = 800
 screen_h = 600
@@ -25,7 +24,10 @@ pygame.display.set_caption("tower defence")
 # pygame.display.set_icon(icon)
 
 background_img = pygame.image.load("background_leve1.png")
-enemy1_imgs_path = [["snake head.png"], ["snake head.png"], ["snake head.png"]]
+enemy1_imgs_path = [["enemy1_frame1_faceRight.xcf", "enemy1_frame2_faceRight.xcf"],
+                    ["enemy1_frame1_faceLeft.xcf", "enemy1_frame2_faceLeft.xcf"],
+                    ["enemy1_frame1_faceLeft.xcf", "enemy1_frame2_faceLeft.xcf"]]
+
 enemy2_imgs_path = [["enemy2_frame1_faceRight.xcf", "enemy2_frame2_faceRight.xcf", "enemy2_frame3_faceRight.xcf"],
                     ["enemy2_frame1_faceForward.xcf", "enemy2_frame2_faceForward.xcf", "enemy2_frame3_faceForward.xcf"],
                     ["enemy2_frame1_faceLeft.xcf", "enemy2_frame2_faceLeft.xcf", "enemy2_frame3_faceLeft.xcf"]]
@@ -112,7 +114,7 @@ def game_loop():
     global score, life
     is_found_on = False
 
-    round_num = 0
+    round_num = 5
     groups_round = round1
     clock = pygame.time.Clock()
     game_run = True
