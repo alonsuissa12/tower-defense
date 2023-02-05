@@ -12,6 +12,7 @@ screen_h = 600
 score = 0
 life = 5
 default_round_length = -300
+max_round = 8
 
 big_font = pygame.font.Font('freesansbold.ttf', 80)
 med_font = pygame.font.Font('freesansbold.ttf', 50)
@@ -24,6 +25,7 @@ pygame.display.set_caption("tower defence")
 # pygame.display.set_icon(icon)
 
 background_img = pygame.image.load("background_leve1.png")
+
 enemy1_imgs_path = [["enemy1_frame1_faceRight.xcf", "enemy1_frame2_faceRight.xcf"],
                     ["enemy1_frame1_faceLeft.xcf", "enemy1_frame2_faceLeft.xcf"],
                     ["enemy1_frame1_faceLeft.xcf", "enemy1_frame2_faceLeft.xcf"]]
@@ -84,8 +86,8 @@ def Round(round_number, number_of_enemies: list, start_time=None, speeds=None):
     return groups
 
 
-def play_round(groups, num, txt_level):
-    if txt_level == 1:
+def play_round(groups, num, text_on: bool):
+    if text_on:
         text = big_font.render("ROUND " + str(num), True, (50, 100, 80))
         screen.blit(text, (200, 250))
         pygame.display.update()
@@ -101,9 +103,13 @@ round2 = Round(2, [5], [[random.randint(-100, 0) for _ in range(5)]])
 round3 = Round(3, [15], [[random.randint(-100, 0) for _ in range(15)]])
 round4 = Round(4, [30], [[random.randint(-100, 0) for _ in range(30)]])
 round5 = Round(5, [0, 1], [[], [random.randint(-100, 0) for _ in range(1)]])
-round6 = Round(5, [10, 2],
+round6 = Round(6, [10, 2],
                [[random.randint(-150, 0) for _ in range(10)], [random.randint(-160, -130) for _ in range(2)]])
-rounds = [round1, round2, round3, round4, round5, round6]
+round7 = Round(7, [20, 7],
+               [[random.randint(-150, 0) for _ in range(20)], [random.randint(-160, -130) for _ in range(7)]])
+round8 = Round(7, [20, 20],
+               [[random.randint(-170, -30) for _ in range(20)], [random.randint(-160, 0) for _ in range(20)]])
+rounds = [round1, round2, round3, round4, round5, round6, round7, round8]
 
 
 def round_manager(round_num):
@@ -112,13 +118,14 @@ def round_manager(round_num):
 
 def game_loop():
     global score, life
-    is_found_on = False
+    is_round_on = False
 
-    round_num = 5
-    groups_round = round1
+    round_num = 0
+    current_round = round1
     clock = pygame.time.Clock()
     game_run = True
     game_playing = True
+    is_text = True
     while game_run:
         while game_playing:
             # print(pygame.mouse.get_pos())
@@ -126,10 +133,15 @@ def game_loop():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
-            if not is_found_on:
+
+            if not is_round_on:
                 round_num += 1
-                groups_round = round_manager(round_num)
-                is_found_on = True
+                if round_num != max_round:
+                    current_round = round_manager(round_num)
+                    is_round_on = True
+                    is_text = True
+                else:
+                    pass  # win event !!
 
             screen.blit(background_img, (0, 0))
 
@@ -139,12 +151,17 @@ def game_loop():
             screen.blit(life_text, (20, 40))
             screen.blit(score_text, (20, 20))
 
-            play_round(groups_round, 1, round_num)
-            round_num = 2
+            play_round(current_round, round_num, is_text)
+            is_text = False
             # enemies_group.draw(screen)
             # enemies_group.update()
-            for group in groups_round:
+            temp = False
+            for group in current_round:
                 life_update2(group)
+                for enemy_ in group:
+                    temp = temp or enemy_.is_on_screen()
+            if not temp:
+                is_round_on = temp
 
             pygame.display.update()
             clock.tick(fps)

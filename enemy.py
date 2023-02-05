@@ -78,3 +78,8 @@ class Enemy(pygame.sprite.Sprite):
 
             return -1
         return 0
+
+    def is_on_screen(self) -> bool:
+        if (self.x <= -5 and self.y > 300) or not self.alive():
+            return False
+        return True
